@@ -28,8 +28,8 @@ router.post("/signup", async (req, res) => {
             name, 
             // birthday, 
             // gender,
-        } = await postUsersSchema.validateAsync(req.body);
-
+        // } = await postUsersSchema.validateAsync(req.body);
+    } = await req.body
     if (password !== passwordCheck) {
       res.status(400).send({
         errorMessage: "패스워드가 불일치합니다.",
