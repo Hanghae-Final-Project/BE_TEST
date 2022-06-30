@@ -18,13 +18,12 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    birthday: {
-        type: String,
-        required: true,
-    },
-    gender: {
-        type: String,
-    },
+    // birthday: {
+    //     type: String,
+    // },
+    // gender: {
+    //     type: String,
+    // },
     userImage: {
         type: String,
     },
