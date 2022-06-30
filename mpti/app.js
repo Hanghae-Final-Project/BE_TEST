@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require('express');
 const mongoose = require('mongoose');
-
+const cors = require('cors');
 mongoose.connect("mongodb://localhost/all_test", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -19,7 +19,7 @@ const imageRouter = require('./routes/images');
 
 app.use(express.json());
 app.use(express.urlencoded());
-
+app.use(cors({ origin: true, credentials: true }));
 app.use('/api', [userRouter]);
 // app.use('/api/images', [imageRouter]);
 
