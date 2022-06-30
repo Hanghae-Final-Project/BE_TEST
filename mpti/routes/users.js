@@ -9,15 +9,15 @@ const User = require("../models/user");
 const authMiddleware = require("../middlewares/auth-middleware");
 
 // <---회원가입 API-->
-// 로그인 배열을 이메일 형식으로 받게 만들어야한다.
-const postUsersSchema = Joi.object({
-  email: Joi.string().pattern(new RegExp("^[0-9a-zA-Z]([-_.0-9a-zA-Z])*@[0-9a-zA-Z]([-_.0-9a-zA-Z])*.([a-zA-Z])*")).required(),
-  password: Joi.string().required(),
-  passwordCheck: Joi.string().required(),
-  name: Joi.string().required(),
-  birthday: Joi.string().required(),
-  gender: Joi.string(),
-});
+// // 로그인 배열을 이메일 형식으로 받게 만들어야한다.
+// const postUsersSchema = Joi.object({
+//   email: Joi.string().pattern(new RegExp("^[0-9a-zA-Z]([-_.0-9a-zA-Z])*@[0-9a-zA-Z]([-_.0-9a-zA-Z])*.([a-zA-Z])*")).required(),
+//   password: Joi.string().required(),
+//   passwordCheck: Joi.string().required(),
+//   name: Joi.string().required(),
+//   birthday: Joi.string().required(),
+//   gender: Joi.string(),
+// });
 
 
 router.post("/signup", async (req, res) => {
@@ -26,8 +26,8 @@ router.post("/signup", async (req, res) => {
             password, 
             passwordCheck, 
             name, 
-            birthday, 
-            gender,
+            // birthday, 
+            // gender,
         } = await postUsersSchema.validateAsync(req.body);
 
     if (password !== passwordCheck) {
@@ -79,12 +79,12 @@ router.post("/signup", async (req, res) => {
       password: crypt_password,
       salt,
       name,
-      birthday,
-      gender,
-      mannerScore,
-      point,
+      // birthday,
+      // gender,
+      // mannerScore,
+      // point,
     }); 
-    console.log(email, password, name, birthday, gender);
+    console.log(email, password, name);
     await user.save();
     res.status(201).json({ message: "회원가입을 축하합니다." });
   } catch (err) {
