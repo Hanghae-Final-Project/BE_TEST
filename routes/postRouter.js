@@ -1,8 +1,8 @@
 const express = require("express");
 const authMiddleware = require("../middlewares/auth-middleware");
-const User = require("../schemas/users");
-const Post = require("../schemas/posts");
-const Images = require("../schemas/image");
+const User = require("../schemas/usersSchema");
+const Post = require("../schemas/postsSchema");
+const Images = require("../schemas/imagesSchema");
 const router = express.Router();
 
 //s3
@@ -30,7 +30,7 @@ router.get('/postList', async (req, res) => {
 // Post 상세 보기
 router.get(
   '/posts/:postId',
-   authMiddlewares,
+   authMiddleware,
   async (req, res) => {
     try {
       const { postId } = req.params;
@@ -55,7 +55,7 @@ router.get(
 //Post 작성
 router.post(
   '/posts/postId',
-  authMiddlewares,
+  authMiddleware,
   async (req, res) => {
     try {
       const { userId } = res.locals.user;
@@ -97,7 +97,7 @@ router.post(
 
 router.put(
   '/posts/:postId',
-  authMiddlewares,
+  authMiddleware,
   async (req, res) => {
     const { postId } = req.params;
     const { userId } = res.locals.user.userId;
@@ -152,7 +152,7 @@ router.delete('posts/:postId', authMiddleware, async (req, res) => {
 });
 
 // 좋아요 추가 기능
-router.post('/likes/:postId', auth, async (req, res) => {
+router.post('/likes/:postId', authMiddleware, async (req, res) => {
   const { userId } = res.locals.user
   const { postId } = req.params
   const isLike = await Like.findOne({ userId:userId,postId})
@@ -175,7 +175,7 @@ router.post('/likes/:postId', auth, async (req, res) => {
 })
 
 // 좋아요 제거 기능
-router.delete('/likes/:postId',auth,
+router.delete('/likes/:postId',authMiddleware,
   async (req, res) => {
       const { userId } = res.locals.user
       const { postId } = req.params
@@ -199,7 +199,7 @@ router.delete('/likes/:postId',auth,
   }
 )
 
-router.get('/likes/:postId', async (req, res) => {
+router.get('/likes/:postId',authMiddleware, async (req, res) => {
   const { postId } = req.params
   const existLikeUsers = await Like.find({ postId })
   const likeUsers = existLikeUsers.map((item) => item.userId)
@@ -207,7 +207,7 @@ router.get('/likes/:postId', async (req, res) => {
 })
 // <---좋아요 개수 API-->
 // 특정 글에 대한 좋아요가 몇 개인지만 보여주는 API
-router.get("/like/:postId", async (req, res) => {
+router.get("/like/:postId",authMiddleware, async (req, res) => {
   const { postId } = req.params;
   const comment = awaitComments.findOne({ postId: Number(postId) });
   const likes = comment["likes"];
