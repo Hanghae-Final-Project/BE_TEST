@@ -84,7 +84,7 @@ router.post("/signup", async (req, res) => {
       // mannerScore,
       // point,
     }); 
-    console.log(email, password, name, birthday, gender);
+    console.log(email, password, name);
     await user.save();
     res.status(201).json({ message: "회원가입을 축하합니다." });
   } catch (err) {
