@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
 
 mongoose.connect("mongodb://localhost/all_test", {
   useNewUrlParser: true,
@@ -15,12 +14,12 @@ db.on('error', console.error.bind(console, 'connection error:'));
 const app = express();
 const port = 3000;
 
-const userRouter = require('./routes/');
-// const imageRouter = require('./routes/images');
+const userRouter = require('./routes/users');
+const imageRouter = require('./routes/images');
 
 app.use(express.json());
 app.use(express.urlencoded());
-app.use(cors({ origin: true, credentials: true }));
+
 app.use('/api', [userRouter]);
 // app.use('/api/images', [imageRouter]);
 
