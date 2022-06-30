@@ -1,5 +1,5 @@
 const express = require("express");
-// const authMiddleware = require("../middlewares/auth-middleware");
+const authMiddleware = require("../middlewares/auth-middleware");
 const User = require("../schemas/users");
 const Post = require("../schemas/posts");
 const Images = require("../schemas/image");
