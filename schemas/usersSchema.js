@@ -12,6 +12,9 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
   },
+  salt: {
+    type: String,
+  },
   name: {
     type: String,
   },
@@ -41,11 +44,11 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-UserSchema.virtual('userId').get(function () {
-  return this._id.toHexString();
-});
-UserSchema.set('toJSON', {
-  virtuals: true,
-});
+// UserSchema.virtual('userId').get(function () {
+//   return this._id.toHexString();
+// });
+// UserSchema.set('toJSON', {
+//   virtuals: true,
+// });
 UserSchema.plugin(AutoIncrement, { inc_field: 'userNum' });
 module.exports = mongoose.model('User', UserSchema);
