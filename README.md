@@ -1,1 +1,1 @@
-# MBTI_BE입니다
+# MPTI_BE입니다
