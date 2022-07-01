@@ -2,11 +2,9 @@ const express = require("express");
 const authMiddleware = require("../middlewares/auth-middleware");
 const User = require("../schemas/usersSchema");
 const Post = require("../schemas/postsSchema");
-const Images = require("../schemas/imagesSchema");
-const router = express.Router();
-
-//s3
-const aws = require('aws-sdk');
+const multer = require("multer");
+const multerS3 = require("multer-s3");
+const aws = require("aws-sdk");
 const s3 = new aws.S3();
 
 aws.config.update({
@@ -29,7 +27,7 @@ router.get('/postList', async (req, res) => {
 
 // Post 상세 보기
 router.get(
-  '/posts/:postId',
+  '/:postId',
    authMiddleware,
   async (req, res) => {
     try {
@@ -54,7 +52,7 @@ router.get(
 );
 //Post 작성
 router.post(
-  '/posts/postId',
+  '/posts',
   authMiddleware,
   async (req, res) => {
     try {
@@ -66,10 +64,9 @@ router.post(
         postContent,
       } = req.body;
 
-      const createdAt = new Date();
-      // const date = now.toLocaleDateString('ko-KR');
-      // const hours = now.getHours();
-      // const minutes = now.getMinutes();
+      const createdAt =  `${years<10?`0${years}`:`${years}`}` + '-' + `${months<10?`0${months}`:`${months}`}` + '-' + `${dates<10?`0${dates}`:`${dates}`}` + ' ' +
+      `${hours<10?`0${hours}`:`${hours}`}` + ':' + `${minutes<10?`0${minutes}`:`${minutes}`}` +
+      ':' + `${seconds<10?`0${seconds}`:`${seconds}`}`;
       const userNickname = existingUser.userNickname;
       const authorId = existingUser._id;
       const createPost = await Post.create({
@@ -96,7 +93,7 @@ router.post(
 // Post 수정 :
 
 router.put(
-  '/posts/:postId',
+  '/:postId',
   authMiddleware,
   async (req, res) => {
     const { postId } = req.params;
@@ -130,7 +127,7 @@ router.put(
 );
 
 // Post 삭제 : 유저확인,삭제되는 포스트와 같은 postId값 가진 댓글들도 삭제
-router.delete('posts/:postId', authMiddleware, async (req, res) => {
+router.delete('/:postId', authMiddleware, async (req, res) => {
   const { postId } = req.params;
   const userId = res.locals.user.userId;
 
