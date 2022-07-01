@@ -7,6 +7,21 @@ const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const User = require('../schemas/usersSchema');
 const authMiddleware = require('../middlewares/auth-middleware');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+const aws = require('aws-sdk');
+const s3 = new aws.S3();
+
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'seohobucket',
+    acl: 'public-read',
+    key: function (req, file, cb) {
+      cb(null, Date.now() + '.' + file.originalname.split('.').pop()); // 이름 설정
+    },
+  }),
+});
 
 // <---회원가입 API-->
 // // 로그인 배열을 이메일 형식으로 받게 만들어야한다.
@@ -164,9 +179,13 @@ router.post('/login', async (req, res) => {
       password: crypt_password,
     }).exec();
 
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET_KEY, {
-      expiresIn: '120m',
-    });
+    const token = jwt.sign(
+      { userId: user._id.toHexString() },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: '120m',
+      }
+    );
     res.send({
       token,
     });
@@ -178,57 +197,73 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.put('/signup/first', authMiddleware, async (req, res) => {
-  const email = res.locals.user.email;
-  const { userImage, nickname, gender, birthday, mbti, introduction } =
-    req.body;
+router.put(
+  '/signup/first',
+  authMiddleware,
+  upload.array('userImage'),
+  async (req, res) => {
+    console.log(req.body);
+    const email = res.locals.user.email;
+    const { nickname, gender, birthday, mbti, introduction } = req.body;
 
-  const existEmail = await User.findOne({ email });
-
-  if (
-    !userImage ||
-    !nickname ||
-    !gender ||
-    !birthday ||
-    !mbti ||
-    !introduction
-  ) {
-    return res.status(400).json({
-      errorMessage: '작성란을 모두 입력해주세요.',
-    });
-  }
-  if (email === existEmail['email']) {
-    //현재 로그인한 사용자가 숙소를 등록한 사용자라면 숙소 정보 수정을 실행한다.
-    await User.updateOne(
-      { email },
-      {
-        $set: {
-          userImage,
-          nickname,
-          gender,
-          birthday,
-          mbti,
-          introduction,
-        },
+    const imageReq = req.files;
+    let imageArray = [];
+    function locationPusher() {
+      for (let i = 0; i < imageReq.length; i++) {
+        imageArray.push(imageReq[i].location);
       }
-    );
-    res.status(200).json({ message: '추가정보를 입력하였습니다.' });
-  } else {
-    return res
-      .status(400)
-      .json({ errorMessage: '등록자만 수정할 수 있습니다.' });
+      return imageArray;
+    }
+    const userImage = locationPusher();
+
+    const existEmail = await User.findOne({ email });
+    console.log(userImage);
+
+    if (
+      !userImage ||
+      !nickname ||
+      !gender ||
+      !birthday ||
+      !mbti ||
+      !introduction
+    ) {
+      return res.status(400).json({
+        errorMessage: '작성란을 모두 입력해주세요.',
+      });
+    }
+    if (email === existEmail['email']) {
+      //현재 로그인한 사용자가 숙소를 등록한 사용자라면 숙소 정보 수정을 실행한다.
+      await User.updateOne(
+        { email },
+        {
+          $set: {
+            userImage,
+            nickname,
+            gender,
+            birthday,
+            mbti,
+            introduction,
+          },
+        }
+      );
+      res.status(200).json({ message: '추가정보를 입력하였습니다.' });
+    } else {
+      return res
+        .status(400)
+        .json({ errorMessage: '등록자만 수정할 수 있습니다.' });
+    }
   }
-});
+);
 
 // <---유저정보조회(토큰 내용 확인) API-->
 router.get('/auth', authMiddleware, async (req, res) => {
   // res.locals에는 user DB로 관리되는 모든 값이 들어 있다.
 
   const { user } = res.locals;
-  const userInfo = { email: user.email };
-  console.log(userInfo);
-  res.send({
-    userInfo,
+  res.status(200).send({
+    user: {
+      userId: user.userId,
+    },
   });
 });
 

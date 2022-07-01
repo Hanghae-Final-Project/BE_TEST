@@ -44,7 +44,7 @@ router.delete('/:commentId', authMiddleware, async (req, res) => {
   const existingComment = await Comment.findOne({
     commentId: parseInt(commentId),
   });
-  if (userId !== existingComment.userId) {
+  if (userId !== existingComment.userId.toString()) {
     res
       .status(400)
       .json({ success: false, message: '내가 쓴 댓글이 아닙니다' });
@@ -70,7 +70,7 @@ router.put('/:commentId', authMiddleware, async (req, res) => {
     commentId: parseInt(commentId),
   });
 
-  if (userId !== existingComment.userId) {
+  if (userId !== existingComment.userId.toString()) {
     res
       .status(400)
       .json({ success: false, message: '내가 쓴 댓글이 아닙니다' });

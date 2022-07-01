@@ -13,7 +13,7 @@ const PostSchema = new mongoose.Schema({
     type: String,
   },
   postImage: {
-    type: String,
+    type: Array,
   },
   postCategory: {
     type: String,
